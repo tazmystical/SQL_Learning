@@ -105,4 +105,43 @@ select round(Avg(salary),2) from employees where job_title = 'SQL Analyst';
 select job_title, round(Avg(salary),2) as avg_salary
 from employees e
 where job_title like '%SQL%'
-group by job_title --
+group by job_title ;
+
+
+--task 5.1
+--Write a query that shows each employee's Manager Full name as a single column named Manager.
+--Then modify the query to include a column that shows their employment status as Active or Inactive.
+SELECT e.*,
+       m.first_name || ' ' || m.last_name AS Manager,
+       CASE
+           WHEN e.end_date IS NULL THEN 'true'
+           ELSE 'false'
+           END                            AS is_active
+FROM employees e
+         FULL JOIN employees m ON e.manager_id = m.emp_id;
+
+
+--5.2 create a view from 5.1
+CREATE VIEW v_employees_info AS
+(
+SELECT e.*,
+       m.first_name || ' ' || m.last_name AS Manager,
+       CASE
+           WHEN e.end_date IS NULL THEN 'true'
+           ELSE 'false'
+           END                            AS is_active
+FROM employees e
+         FULL JOIN employees m ON e.manager_id = m.emp_id
+    )
+
+--Task 6
+-- write a query with average salaries per position. Please round.
+Select e.job_title, round(Avg(e.salary),2) as Avg_Salary from employees e
+group by e.job_title
+order by e.job_title asc;
+
+--Task 7
+--write a query that returns salary avg per division
+select d.department, round(avg(e.salary),2) from departments d
+left join employees e on d.department_id = e.department_id
+group by d.department

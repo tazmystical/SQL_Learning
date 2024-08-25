@@ -77,3 +77,32 @@ insert into departments values
 
 select * from departments;
 
+--task 4.1
+select * from employees
+where first_name = 'Jack' and last_name = 'Franklin';
+
+update employees set salary = 7200, job_title = 'Senior SQL Analyst'
+where first_name = 'Jack' and last_name = 'Franklin'
+RETURNING *;
+
+--task 4.2
+select * from employees where job_title = 'Customer Support';
+
+update employees set job_title = 'Customer Specialist'
+where job_title = 'Customer Support'
+returning *;
+
+--task 4.3
+select * from employees where job_title like '%SQL Analyst%';
+
+update employees set salary = salary * 1.06
+where job_title like '%SQL Analyst%'
+returning *;
+
+--task 4.4
+select round(Avg(salary),2) from employees where job_title = 'SQL Analyst';
+
+select job_title, round(Avg(salary),2) as avg_salary
+from employees e
+where job_title like '%SQL%'
+group by job_title --

@@ -161,3 +161,14 @@ with cte_salary_info as (SELECT e.emp_id,
 -- how many people earn less than their positions avg salary?
 select count(*) from cte_salary_info
 where avg_salary > salary;
+
+--task 9
+--show a running total of salary using start_date. Include terminated employees
+select employees.emp_id, employees.salary, employees.start_date, Sum(salary) over (ORDER BY start_date)
+from employees
+ORDER BY start_date;
+--what was the total salary at end of 2018?
+select employees.emp_id, employees.salary, employees.start_date, Sum(salary) over (ORDER BY start_date)
+from employees
+where start_date <= date('2018-12-31')
+ORDER BY start_date;

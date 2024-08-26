@@ -144,4 +144,20 @@ order by e.job_title asc;
 --write a query that returns salary avg per division
 select d.department, round(avg(e.salary),2) from departments d
 left join employees e on d.department_id = e.department_id
-group by d.department
+group by d.department;
+
+--task 8.1
+--write a query that returns emp id, f nmae, l name, title, salary and avg salary per title. order by emp id
+with cte_salary_info as (SELECT e.emp_id,
+                                e.first_name,
+                                e.last_name,
+                                e.job_title,
+                                e.salary,
+                                ROUND(AVG(e.salary) OVER (PARTITION BY e.job_title), 2) AS avg_salary
+                         FROM employees e
+                         ORDER BY e.emp_id)
+
+--task 8.2
+-- how many people earn less than their positions avg salary?
+select count(*) from cte_salary_info
+where avg_salary > salary;

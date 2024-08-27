@@ -175,19 +175,30 @@ ORDER BY start_date;
 
 --task 10
 --show a running total of salary using start_date and exclude those that have left company
-
-drop table if exists temp_salaries;
-create TEMPORARY table temp_salaries as
+With cte_SalaryPool as (
 select employees.emp_id, employees.salary, employees.start_date, employees.end_date from employees
 Union
 --flip end_date into start so that running total is done chronologically and multiply salary by -1 so th SUM works as expected
 select employees.emp_id, employees.salary * -1.0, employees.end_date as start_date , employees.end_date from employees
-where end_date is not null;
---select * from temp_salaries order by start_date;
+where end_date is not null)
 
 --what was the total salary at end of 2018?
 select ts.emp_id, ts.salary, ts.start_date as change_date, Sum(ts.salary) over (ORDER BY ts.start_date)
-from temp_salaries as ts
+from cte_SalaryPool as ts
 where ts.start_date <= date('2018-12-31')
 ORDER BY ts. start_date;
 
+--task 11
+--Report on the top earner/salary for each job title. List full name, title and salary.
+
+with cte_rankedSalary as (
+    SELECT
+e.first_name || ' ' || e.last_name as full_name, e.job_title, e.salary,
+        RANK() OVER (PARTITION BY job_title ORDER BY salary DESC) AS salary_rank
+    FROM
+        employees e)
+
+select full_name, job_title, salary
+from cte_rankedSalary
+where salary_rank = 1
+order by job_title;

@@ -188,9 +188,8 @@ from cte_SalaryPool as ts
 where ts.start_date <= date('2018-12-31')
 ORDER BY ts. start_date;
 
---task 11
+--task 11.1
 --Report on the top earner/salary for each job title. List full name, title and salary.
-
 with cte_rankedSalary as (
     SELECT
 e.first_name || ' ' || e.last_name as full_name, e.job_title, e.salary,
@@ -202,3 +201,35 @@ select full_name, job_title, salary
 from cte_rankedSalary
 where salary_rank = 1
 order by job_title;
+
+
+
+--task 11.2
+--Add avg salary per position
+WITH cte_rankedSalary AS (SELECT e.first_name || ' ' || e.last_name                        AS full_name,
+                                 e.job_title,
+                                 e.salary,
+                                 RANK() OVER (PARTITION BY job_title ORDER BY salary DESC) AS salary_rank
+                          FROM employees e)
+
+select rs.full_name, rs.job_title, rs.salary,
+       (Select round(Avg(salary),2) from employees e where rs.job_title = e.job_title group by e.job_title) as avg_title_salary
+from cte_rankedSalary rs
+where salary_rank = 1
+order by rs.job_title;
+
+
+--task 11.3
+--remove anyone who is the only person in their role.
+WITH cte_rankedSalary AS (SELECT e.first_name || ' ' || e.last_name                        AS full_name,
+                                 e.job_title,
+                                 e.salary,
+                                 RANK() OVER (PARTITION BY job_title ORDER BY salary DESC) AS salary_rank
+                          FROM employees e)
+Select * from (
+select rs.full_name, rs.job_title, rs.salary,
+       (Select round(Avg(salary),2) from employees e where rs.job_title = e.job_title group by e.job_title) as avg_title_salary
+from cte_rankedSalary rs
+where salary_rank = 1
+order by rs.job_title) as uf
+where uf.salary <> uf.avg_title_salary;
